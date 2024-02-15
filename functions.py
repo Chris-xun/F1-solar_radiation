@@ -50,8 +50,8 @@ def plot_data(time, intensity=None, temp=None):
     
     # if intensity data is provided
     if intensity is not None:
-        plt.plot(time,intensity, label='intensity')
-        plt.legend()
+        print('plotting intensity')
+        plt.plot(time, intensity)
         plt.xlabel('time')
         time_arr_len = len(time)    
         plt.xticks([time[0], time[int(time_arr_len/3)],time[int(time_arr_len*2/3)],  time[-1]])
