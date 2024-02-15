@@ -55,6 +55,11 @@ def plot_data(time, intensity=None, temp=None):
         plt.xlabel('time')
         time_arr_len = len(time)    
         plt.xticks([time[0], time[int(time_arr_len/3)],time[int(time_arr_len*2/3)],  time[-1]])
+        max_I, min_I = float(max(intensity)), float(min(intensity))
+        intensity_interval = (float(max_I) - float(min_I))/10
+        intensity_ticks = [min_I + i*intensity_interval for i in range(0,11)]
+        print(intensity_ticks)
+        plt.yticks(intensity_ticks)
         plt.savefig('data\\intensity.png')
         plt.close()
         
