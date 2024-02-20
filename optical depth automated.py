@@ -23,34 +23,21 @@ def update_subsolar_longitude(initial_longitude, seconds_elapsed):
     return new_longitude
 
 # Assuming we have the subsolar latitude for the day
-subsolar_latitude = 13.47  # Replace every time
-london_lattitude = 51.5074
-london_longitude = 0.1278
-initial_subsolar_longitude = -0.127758
-current_time = datetime.now()
-seconds_elapsed = 0
+#subsolar_latitude = 13.47  # Replace every time
+#london_lattitude = 51.3
+#london_longitude = -0.07
+#initial_subsolar_longitude = -0.127758 
 
-# Update subsolar point every 5 seconds
-for i in range(0, 17280):  # There are 17280 five-second intervals in a day
-    subsolar_longitude = update_subsolar_longitude(initial_subsolar_longitude, seconds_elapsed)
-    # Here you would call your zenith angle calculation function
-    # zenith_angle_deg = calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude)
-    
-    # Increment the time by 5 seconds
-    seconds_elapsed += 5
+hours = 4 #number of hours we recorded the data for
 
-# Function to calculate zenith angle
-def calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude):
-    london_latitude_rad = radians(london_latitude)
-    london_longitude_rad = radians(london_longitude)
-    subsolar_latitude_rad = radians(subsolar_latitude)
-    subsolar_longitude_rad = radians(subsolar_longitude)
+# Update zenith angle every hour
+for i in range(0, hours):  # There are 17280 five-second intervals in a day
+    start_zenith_angle = radians (63.0047)
+    hour_angle = radians (0.1971)
+    new_zenith_angle = start_zenith_angle + hour_angle*hours 
 
-    zenith_angle_rad = acos(sin(subsolar_latitude_rad) * sin(london_latitude_rad) +
-                            cos(subsolar_latitude_rad) * cos(london_latitude_rad) *
-                            cos(london_longitude_rad - subsolar_longitude_rad))
-
-    return degrees(zenith_angle_rad)
+# List of all zenith angles
+zenith_angles = np.list (new_zenith_angle)  #replace with an array of zenith angles
 
 # Load the data, assuming the 4th column contains irradiance values and skipping the first 4 rows
 # irr_data = np.loadtxt('C:\Users\aryan\OneDrive - Imperial College London\Physics\Year 3 Lab\Solar Radiation\F1-solar_radiation\data\LOG240215-0945.csv', delimiter=',', skiprows=3, usecols=[3])
@@ -59,8 +46,7 @@ irr_data = f.import_data(r'C:\Users\aryan\OneDrive - Imperial College London\Phy
 # Assume I_0 is known or has been measured/calculated beforehand
 I_0 = 1367 # mean extra terrestrial irradiance value
 
-# Placeholder for the zenith angles, which you would input or calculate
-zenith_angles = np.array([...]) # replace with an array of zenith angles
+
 
 # Calculate air mass for each zenith angle
 air_masses = calculate_air_mass(zenith_angles)
