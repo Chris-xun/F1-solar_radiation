@@ -2,6 +2,9 @@
  
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import pvlib
+from math import radians, degrees, sin, cos, acos
 
 def import_data(filename):
     """
@@ -17,11 +20,6 @@ def import_data(filename):
                     index_line = line
                 if '.data;' in line:
                     temp.write(line)
-                
-    # # importing the data and selecting columns
-    # with open('data\\temp', 'r') as f:
-    #     data = np.genfromtxt(f, delimiter=';', skip_header=1)
-    #     print(index_line)
     
     # imorting data, this needs the correct logging setting as recored in onenote
     data = np.loadtxt('data\\temp', delimiter=';', dtype='str')
@@ -81,3 +79,41 @@ def plot_data(time, intensity=None, temp=None):
     
     
     return None
+
+
+
+
+# Function to calculate air mass given the zenith angle
+def calculate_air_mass(zenith_angle):
+    result = []
+    for angle in zenith_angle:
+        mass = 1 / (np.cos(radians(angle)) + 0.50572*(96.075-angle)**(-1.6364))
+        result.append(mass)
+    return result
+
+# Function to calculate optical depth given the slope of the linear fit
+def calculate_optical_depth(slope):
+    return -slope
+
+
+def calculate_solar_zenith_angle(initial_time, final_time):
+    """
+    This function calculates the solar zenith angle
+    """
+    
+    # Define the geographical location (London)
+    latitude, longitude = 51.5074, -0.1278
+
+    # Define the time range
+
+    timezone = 'Europe/London'
+    times = pd.date_range(initial_time, final_time, freq='5S', tz=timezone)
+
+    # Calculate solar position
+    solpos = pvlib.solarposition.get_solarposition(times, latitude, longitude)
+    print(times)
+
+    # Extract the Solar Zenith Angle
+    sza = solpos['apparent_zenith']
+    
+    return sza

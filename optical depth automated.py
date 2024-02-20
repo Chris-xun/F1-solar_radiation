@@ -17,92 +17,73 @@ def calculate_air_mass(zenith_angle):
 def calculate_optical_depth(slope):
     return -slope
 
-# Function to update subsolar longitude
-def update_subsolar_longitude(initial_longitude, seconds_elapsed):
-    # The Earth rotates 360 degrees in 24 hours
-    # => 360 degrees in 86400 seconds
-    # => 0.00416667 degrees per second
-    degrees_per_second = 0.00416667
-    new_longitude = (initial_longitude + degrees_per_second * seconds_elapsed) % 360
-    return new_longitude
+# def calculate_zenith_angle(initial_time, final_time, initial_angle, change_in_zenith_angle_per_hour):
+#     # Convert the times to datetime objects
+#     initial_time = datetime.strptime(initial_time, '%H:%M:%S')
+#     final_time = datetime.strptime(final_time, '%H:%M:%S')
 
-# Assuming we have the subsolar latitude for the day
-#subsolar_latitude = 13.47  # Replace every time
-#london_lattitude = 51.3
-#london_longitude = -0.07
-#initial_subsolar_longitude = -0.127758 
+#     # Calculate the time difference
+#     time_difference = final_time - initial_time
 
-hours = 4 #number of hours we recorded the data for
+#     # Calculate the number of hours between the two times
+#     hours = time_difference.total_seconds() / 3600
 
-# Update subsolar point every 5 seconds
-for i in range(0, 17280):  # There are 17280 five-second intervals in a day
-    subsolar_longitude = update_subsolar_longitude(initial_subsolar_longitude, seconds_elapsed)
-    # Here you would call your zenith angle calculation function
-    # zenith_angle_deg = calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude)
-    
-    # Increment the time by 5 seconds
-    seconds_elapsed += 5
-
-# Function to calculate zenith angle
-def calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude):
-    london_latitude_rad = radians(london_latitude)
-    london_longitude_rad = radians(london_longitude)
-    subsolar_latitude_rad = radians(subsolar_latitude)
-    subsolar_longitude_rad = radians(subsolar_longitude)
-
-    zenith_angle_rad = acos(sin(subsolar_latitude_rad) * sin(london_latitude_rad) +
-                            cos(subsolar_latitude_rad) * cos(london_latitude_rad) *
-                            cos(london_longitude_rad - subsolar_longitude_rad))
-
-    return degrees(zenith_angle_rad)
+#     # Create a list of times at 5 second intervals
+#     times = [initial_time + timedelta(seconds=5*i) for i in range(int(hours*720))]
+#     change_in_zenith_angle_per_interval = 5 * change_in_zenith_angle_per_hour / 3600
+#     zenith_angles = []
+#     zenith_angles.append(initial_angle)
+#     for i in range(1, len(times)):
+#         zenith_angles.append(zenith_angles[i-1] + change_in_zenith_angle_per_interval)
+        
+#     return zenith_angles
 
 
-# Update subsolar point every 5 seconds
-zenith_angles = []
-for i in range(0, 17280):  # There are 17280 five-second intervals in a day
-    subsolar_longitude = update_subsolar_longitude(initial_subsolar_longitude, seconds_elapsed)
-    # Here you would call your zenith angle calculation function
-    zenith_angle_deg = calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude)
-    zenith_angles.append(zenith_angle_deg)
-    
-    
-    # Increment the time by 5 seconds
-    seconds_elapsed += 5
+# hour_change is the change of zenith angle per hour
+def plotting(file):
+    # Load the data, assuming the 4th column contains irradiance values and skipping the first 4 rows
+    # irr_data = np.loadtxt('C:\Users\aryan\OneDrive - Imperial College London\Physics\Year 3 Lab\Solar Radiation\F1-solar_radiation\data\LOG240215-0945.csv', delimiter=',', skiprows=3, usecols=[3])
+    data = f.import_data(file)
+    date, time, irr_data, temp = data[0], data[1], data[2], data[3]
+    irr_data = np.array([float(i) for i in irr_data])
+    initial_time = time[0]
+    initial_date = date[0]
+    final_time = time[-1]
+    final_date = date[-1]
+    initial_time = initial_date + ' ' + initial_time
+    final_time = final_date + ' ' + final_time
+    zenith_angles = f.calculate_solar_zenith_angle(initial_time, final_time)
 
-# Load the data, assuming the 4th column contains irradiance values and skipping the first 4 rows
-# irr_data = np.loadtxt('C:\Users\aryan\OneDrive - Imperial College London\Physics\Year 3 Lab\Solar Radiation\F1-solar_radiation\data\LOG240215-0945.csv', delimiter=',', skiprows=3, usecols=[3])
-data = f.import_data(r'data\LOG240212-1119.csv')
-date, time, irr_data, temp = data[0], data[1], data[2], data[3]
-irr_data = np.array([float(i) for i in irr_data])
+    # Assume I_0 is known or has been measured/calculated beforehand
+    I_0 = 1.367 # mean extra terrestrial irradiance value
 
-# Assume I_0 is known or has been measured/calculated beforehand
-I_0 = 1367 # mean extra terrestrial irradiance value
+    # Calculate air mass for each zenith angle
+    air_masses = calculate_air_mass(zenith_angles)
 
-# Placeholder for the zenith angles, which you would input or calculate
-zenith_angles = np.array([...]) # replace with an array of zenith angles
+    # Calculate the natural logarithm of the ratio of I/I_0 for each data point
+    ln_I_ratio = np.log(irr_data / I_0)
 
-# Calculate air mass for each zenith angle
-air_masses = calculate_air_mass(zenith_angles)
+    print(len(air_masses), len(ln_I_ratio), len(time))
+    # Plot the data
+    plt.scatter(air_masses[:len(ln_I_ratio)], ln_I_ratio)###############################3
+    plt.xlabel('Air Mass')
+    plt.ylabel('ln(I/I_0)')
 
-# Calculate the natural logarithm of the ratio of I/I_0 for each data point
-ln_I_ratio = np.log(irr_data / I_0)
+    # Perform a linear fit to the data
+    coefficients = np.polyfit(air_masses[:len(ln_I_ratio)], ln_I_ratio, 1)###############################3
+    slope, intercept = coefficients
 
-# Plot the data
-plt.scatter(air_masses, ln_I_ratio)
-plt.xlabel('Air Mass')
-plt.ylabel('ln(I/I_0)')
+    # Calculate the optical depth using the slope of the linear fit
+    optical_depth = calculate_optical_depth(slope)
 
-# Perform a linear fit to the data
-coefficients = np.polyfit(air_masses, ln_I_ratio, 1)
-slope, intercept = coefficients
+    # Plot the linear fit line
+    fit_line = np.polyval(coefficients, air_masses[:len(ln_I_ratio)]) ###############################3
+    plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: Optical Depth = {optical_depth:.2f}', color='red')###############################3
+    plt.legend()
 
-# Calculate the optical depth using the slope of the linear fit
-optical_depth = calculate_optical_depth(slope)
+    # Show the plot
+    plt.show()
 
-# Plot the linear fit line
-fit_line = np.polyval(coefficients, air_masses)
-plt.plot(air_masses, fit_line, label=f'Linear Fit: Optical Depth = {optical_depth:.2f}', color='red')
-plt.legend()
 
-# Show the plot
-plt.show()
+# each 5 second interval is 5/3600=0.00138889 hours
+plotting(r'data\LOG240218-0921.csv')
