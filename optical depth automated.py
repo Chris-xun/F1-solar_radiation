@@ -23,8 +23,9 @@ def update_subsolar_longitude(initial_longitude, seconds_elapsed):
     return new_longitude
 
 # Assuming we have the subsolar latitude for the day
-subsolar_latitude = 13° 47'  # Replace every time
-
+subsolar_latitude = 13.47  # Replace every time
+london_lattitude = 51.5074
+london_longitude = 0.1278
 initial_subsolar_longitude = -0.127758
 current_time = datetime.now()
 seconds_elapsed = 0
