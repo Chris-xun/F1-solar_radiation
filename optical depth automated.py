@@ -7,7 +7,11 @@ import functions as f
 
 # Function to calculate air mass given the zenith angle
 def calculate_air_mass(zenith_angle):
-    return 1 / (np.cos(np.radians(zenith_angle)) + 0.50572*(96.075-zenith_angle)**(-1.6364))
+    result = []
+    for angle in zenith_angle:
+        mass = 1 / (np.cos(radians(angle)) + 0.50572*(96.075-angle)**(-1.6364))
+        result.append(mass)
+    return result
 
 # Function to calculate optical depth given the slope of the linear fit
 def calculate_optical_depth(slope):
@@ -30,23 +34,52 @@ def update_subsolar_longitude(initial_longitude, seconds_elapsed):
 
 hours = 4 #number of hours we recorded the data for
 
-# Update zenith angle every hour
-for i in range(0, hours):  # There are 17280 five-second intervals in a day
-    start_zenith_angle = radians (63.0047)
-    hour_angle = radians (0.1971)
-    new_zenith_angle = start_zenith_angle + hour_angle*hours 
+# Update subsolar point every 5 seconds
+for i in range(0, 17280):  # There are 17280 five-second intervals in a day
+    subsolar_longitude = update_subsolar_longitude(initial_subsolar_longitude, seconds_elapsed)
+    # Here you would call your zenith angle calculation function
+    # zenith_angle_deg = calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude)
+    
+    # Increment the time by 5 seconds
+    seconds_elapsed += 5
 
-# List of all zenith angles
-zenith_angles = np.list (new_zenith_angle)  #replace with an array of zenith angles
+# Function to calculate zenith angle
+def calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude):
+    london_latitude_rad = radians(london_latitude)
+    london_longitude_rad = radians(london_longitude)
+    subsolar_latitude_rad = radians(subsolar_latitude)
+    subsolar_longitude_rad = radians(subsolar_longitude)
+
+    zenith_angle_rad = acos(sin(subsolar_latitude_rad) * sin(london_latitude_rad) +
+                            cos(subsolar_latitude_rad) * cos(london_latitude_rad) *
+                            cos(london_longitude_rad - subsolar_longitude_rad))
+
+    return degrees(zenith_angle_rad)
+
+
+# Update subsolar point every 5 seconds
+zenith_angles = []
+for i in range(0, 17280):  # There are 17280 five-second intervals in a day
+    subsolar_longitude = update_subsolar_longitude(initial_subsolar_longitude, seconds_elapsed)
+    # Here you would call your zenith angle calculation function
+    zenith_angle_deg = calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude)
+    zenith_angles.append(zenith_angle_deg)
+    
+    
+    # Increment the time by 5 seconds
+    seconds_elapsed += 5
 
 # Load the data, assuming the 4th column contains irradiance values and skipping the first 4 rows
 # irr_data = np.loadtxt('C:\Users\aryan\OneDrive - Imperial College London\Physics\Year 3 Lab\Solar Radiation\F1-solar_radiation\data\LOG240215-0945.csv', delimiter=',', skiprows=3, usecols=[3])
-irr_data = f.import_data(r'C:\Users\aryan\OneDrive - Imperial College London\Physics\Year 3 Lab\Solar Radiation\F1-solar_radiation\data\LOG240215-0945.csv')
+data = f.import_data(r'data\LOG240212-1119.csv')
+date, time, irr_data, temp = data[0], data[1], data[2], data[3]
+irr_data = np.array([float(i) for i in irr_data])
 
 # Assume I_0 is known or has been measured/calculated beforehand
 I_0 = 1367 # mean extra terrestrial irradiance value
 
-
+# Placeholder for the zenith angles, which you would input or calculate
+zenith_angles = np.array([...]) # replace with an array of zenith angles
 
 # Calculate air mass for each zenith angle
 air_masses = calculate_air_mass(zenith_angles)
