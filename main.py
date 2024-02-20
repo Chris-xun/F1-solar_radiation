@@ -2,7 +2,8 @@ import functions as f
 import matplotlib.pyplot as plt
 
 
-date, time, intensity, temp = f.import_data(r'data\LOG240217-0841.csv')
+data = f.import_data(r'data\LOG240212-1119.csv')
+date, time, intensity, temp = data[0], data[1], data[2], data[3]
 
 f.plot_data(time, intensity, temp)
 

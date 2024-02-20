@@ -30,7 +30,7 @@ def import_data(filename):
     intensity = data[:,3]
     temperature = data[:,4]
     
-    return date, time, intensity, temperature
+    return np.array([date, time, intensity, temperature])
 
 def rm():
     """
