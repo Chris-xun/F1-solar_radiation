@@ -45,6 +45,7 @@ def plot_data(time, intensity=None, temp=None):
     """
     This function plots the data
     """
+    intensity = [float(i) for i in intensity]
     
 
     
@@ -52,9 +53,17 @@ def plot_data(time, intensity=None, temp=None):
     if intensity is not None:
         print('plotting intensity')
         plt.plot(time, intensity)
+        
+        # setting the x and y ticks
         plt.xlabel('time')
         time_arr_len = len(time)    
         plt.xticks([time[0], time[int(time_arr_len/3)],time[int(time_arr_len*2/3)],  time[-1]])
+        max_I, min_I = float(max(intensity)), float(min(intensity))
+        intensity_interval = (float(max_I) - float(min_I))/10
+        intensity_ticks = [min_I + i*intensity_interval for i in range(0,11)]
+        plt.yticks(intensity_ticks)
+        
+        
         plt.savefig('data\\intensity.png')
         plt.close()
         
