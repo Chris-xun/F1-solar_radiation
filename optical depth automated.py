@@ -22,6 +22,23 @@ def update_subsolar_longitude(initial_longitude, seconds_elapsed):
     new_longitude = (initial_longitude + degrees_per_second * seconds_elapsed) % 360
     return new_longitude
 
+# Assuming we have the subsolar latitude for the day
+subsolar_latitude = 13.47  # Replace every time
+london_lattitude = 51.5074
+london_longitude = 0.1278
+initial_subsolar_longitude = -0.127758
+current_time = datetime.now()
+seconds_elapsed = 0
+
+# Update subsolar point every 5 seconds
+for i in range(0, 17280):  # There are 17280 five-second intervals in a day
+    subsolar_longitude = update_subsolar_longitude(initial_subsolar_longitude, seconds_elapsed)
+    # Here you would call your zenith angle calculation function
+    # zenith_angle_deg = calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude)
+    
+    # Increment the time by 5 seconds
+    seconds_elapsed += 5
+
 # Function to calculate zenith angle
 def calculate_zenith_angle(london_latitude, london_longitude, subsolar_latitude, subsolar_longitude):
     london_latitude_rad = radians(london_latitude)
