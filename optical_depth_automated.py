@@ -47,6 +47,7 @@ def plotting(file):
     data = f.import_data(file)
     date, time, irr_data, temp = data[0], data[1], data[2], data[3]
     irr_data = np.array([float(i) for i in irr_data])
+    irr_data_direct = cdf.cal_direct_from_data(time, irr_data, file)
     initial_time = time[0]
     initial_date = date[0]
     final_time = time[-1]
@@ -64,7 +65,6 @@ def plotting(file):
     # Calculate the natural logarithm of the ratio of I/I_0 for each data point
     ln_I_ratio = np.log(irr_data / I_0)
 
-    print(len(air_masses), len(ln_I_ratio), len(time))
     # Plot the data
     plt.plot(air_masses[:len(ln_I_ratio)], ln_I_ratio, 'x')###############################3
     plt.xlabel('Air Mass', fontsize=12)
@@ -83,11 +83,38 @@ def plotting(file):
     plt.legend()
     plt.title('Optical Depth vs Air Mass')
     end_points = [fit_line[0], fit_line[len(ln_I_ratio)-1]]   ###############################3
-    plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
+    # plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
     plt.savefig('data\\optical_depth.png', dpi=300)
     plt.close()
     # Show the plot
     # plt.show()
+    
+    
+    
+    # for direct irr only
+    print(irr_data_direct)
+    ln_I_ratio = np.log(irr_data_direct / I_0)
+    # Plot the data
+    plt.plot(air_masses[:len(ln_I_ratio)], ln_I_ratio, 'x')###############################3
+    plt.xlabel('Air Mass', fontsize=12)
+    plt.ylabel('$ln( I / I_0 )$', fontsize=14)
+
+    # Perform a linear fit to the data
+    coefficients = np.polyfit(air_masses[:len(ln_I_ratio)], ln_I_ratio, 1)###############################3
+    slope, intercept = coefficients
+
+    # Calculate the optical depth using the slope of the linear fit
+    optical_depth = calculate_optical_depth(slope)
+
+    # Plot the linear fit line
+    fit_line = np.polyval(coefficients, air_masses[:len(ln_I_ratio)]) ###############################3
+    plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: Optical Depth = {optical_depth:.2f}', color='red')###############################3
+    plt.legend()
+    plt.title('Optical Depth vs Air Mass')
+    end_points = [fit_line[0], fit_line[len(ln_I_ratio)-1]]   ###############################3
+    # plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
+    plt.savefig('data\\optical_depth_direct.png', dpi=300)
+    plt.close()
 
 
 # each 5 second interval is 5/3600=0.00138889 hours
