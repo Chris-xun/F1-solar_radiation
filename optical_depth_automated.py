@@ -65,7 +65,7 @@ def plotting(file):
 
     print(len(air_masses), len(ln_I_ratio), len(time))
     # Plot the data
-    plt.scatter(air_masses[:len(ln_I_ratio)], ln_I_ratio)###############################3
+    plt.plot(air_masses[:len(ln_I_ratio)], ln_I_ratio, 'x')###############################3
     plt.xlabel('Air Mass')
     plt.ylabel('ln(I/I_0)')
 
@@ -80,10 +80,14 @@ def plotting(file):
     fit_line = np.polyval(coefficients, air_masses[:len(ln_I_ratio)]) ###############################3
     plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: Optical Depth = {optical_depth:.2f}', color='red')###############################3
     plt.legend()
+    plt.title('Optical Depth vs Air Mass')
+    end_points = [fit_line[0], fit_line[len(ln_I_ratio)-1]]   ###############################3
+    plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
+    plt.savefig('data\\optical_depth.png')
 
     # Show the plot
     plt.show()
 
 
 # each 5 second interval is 5/3600=0.00138889 hours
-plotting(r'data\LOG240218-0921.csv')
+# plotting(r'data\LOG240218-0921.csv')
