@@ -53,16 +53,16 @@ def plot_data(time, intensity=None, temp=None):
         plt.plot(time, intensity)
         
         # setting the x and y ticks
-        plt.xlabel('time')
+        plt.xlabel('Time', fontsize=12)
         time_arr_len = len(time)    
         plt.xticks([time[0], time[int(time_arr_len/3)],time[int(time_arr_len*2/3)],  time[-1]])
         max_I, min_I = float(max(intensity)), float(min(intensity))
         intensity_interval = (float(max_I) - float(min_I))/10
         intensity_ticks = [min_I + i*intensity_interval for i in range(0,11)]
         plt.yticks(intensity_ticks)
+        plt.ylabel('Intensity $ W/m^2 $', fontsize=14)
         
-        
-        plt.savefig('data\\intensity.png')
+        plt.savefig('data\\intensity.png', dpi=300)
         plt.close()
         
     # if temperature data is provided
@@ -72,11 +72,9 @@ def plot_data(time, intensity=None, temp=None):
         plt.xlabel('time')
         time_arr_len = len(time)    
         plt.xticks([time[0], time[int(time_arr_len/3)],time[int(time_arr_len*2/3)],  time[-1]])
-        plt.savefig('data\\temp.png')
+        plt.savefig('data\\temp.png', dpi=300)
         plt.close()
 
-
-    
     
     return None
 

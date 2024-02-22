@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from math import radians, degrees, sin, cos, acos
 from datetime import datetime, timedelta
 import functions as f
+import cal_direct_flux as cdf
 
 
 # Function to calculate air mass given the zenith angle
@@ -66,8 +67,8 @@ def plotting(file):
     print(len(air_masses), len(ln_I_ratio), len(time))
     # Plot the data
     plt.plot(air_masses[:len(ln_I_ratio)], ln_I_ratio, 'x')###############################3
-    plt.xlabel('Air Mass')
-    plt.ylabel('ln(I/I_0)')
+    plt.xlabel('Air Mass', fontsize=12)
+    plt.ylabel('$ln( I / I_0 )$', fontsize=14)
 
     # Perform a linear fit to the data
     coefficients = np.polyfit(air_masses[:len(ln_I_ratio)], ln_I_ratio, 1)###############################3
@@ -83,10 +84,10 @@ def plotting(file):
     plt.title('Optical Depth vs Air Mass')
     end_points = [fit_line[0], fit_line[len(ln_I_ratio)-1]]   ###############################3
     plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
-    plt.savefig('data\\optical_depth.png')
-
+    plt.savefig('data\\optical_depth.png', dpi=300)
+    plt.close()
     # Show the plot
-    plt.show()
+    # plt.show()
 
 
 # each 5 second interval is 5/3600=0.00138889 hours
