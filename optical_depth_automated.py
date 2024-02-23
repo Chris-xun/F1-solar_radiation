@@ -1,3 +1,6 @@
+# Xun Yu
+# Description: This file holds functions that are used to perform optical depth related calculations and graphings from the data
+
 import numpy as np
 import matplotlib.pyplot as plt
 from math import radians, degrees, sin, cos, acos
@@ -47,6 +50,15 @@ def plotting(file):
     data = f.import_data(file)
     date, time, irr_data, temp = data[0], data[1], data[2], data[3]
     irr_data = np.array([float(i) for i in irr_data])
+    
+    
+    #test that the data is continous and at 5 second intervals
+    xxx = cdf.time_to_seconds(time)
+    for i in range(len(xxx)-2):
+        if xxx[i+1] - xxx[i] != 5:
+            print('data not continous at',time[i])
+    
+    
     irr_data_direct = cdf.cal_direct_from_data(time, irr_data, file)
     initial_time = time[0]
     initial_date = date[0]
@@ -55,9 +67,13 @@ def plotting(file):
     initial_time = initial_date + ' ' + initial_time
     final_time = final_date + ' ' + final_time
     zenith_angles = f.calculate_solar_zenith_angle(initial_time, final_time)
+    
+    
+    
+
 
     # Assume I_0 is known or has been measured/calculated beforehand
-    I_0 = 1.367 # mean extra terrestrial irradiance value
+    I_0 = 1367 # mean extra terrestrial irradiance value
 
     # Calculate air mass for each zenith angle
     air_masses = calculate_air_mass(zenith_angles)
@@ -67,7 +83,7 @@ def plotting(file):
 
     # Plot the data
     plt.plot(air_masses[:len(ln_I_ratio)], ln_I_ratio, 'x')###############################3
-    plt.xlabel('Air Mass', fontsize=12)
+    plt.xlabel('Air Mass Ratio', fontsize=12)
     plt.ylabel('$ln( I / I_0 )$', fontsize=14)
 
     # Perform a linear fit to the data
@@ -79,9 +95,9 @@ def plotting(file):
 
     # Plot the linear fit line
     fit_line = np.polyval(coefficients, air_masses[:len(ln_I_ratio)]) ###############################3
-    plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: Optical Depth = {optical_depth:.2f}', color='red')###############################3
+    plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: $ \\beta $ coefficient = {optical_depth:.2f}', color='red')###############################3
     plt.legend()
-    plt.title('Optical Depth vs Air Mass')
+    # plt.title('Optical Depth vs Air Mass')
     end_points = [fit_line[0], fit_line[len(ln_I_ratio)-1]]   ###############################3
     # plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
     plt.savefig('data\\optical_depth.png', dpi=300)
@@ -92,11 +108,13 @@ def plotting(file):
     
     
     # for direct irr only
-    print(irr_data_direct)
+    if 0.0 in irr_data_direct:
+        print('0.0 in irr_data_direct')
+        [0.001 for i in irr_data_direct if i == 0.0]
     ln_I_ratio = np.log(irr_data_direct / I_0)
     # Plot the data
     plt.plot(air_masses[:len(ln_I_ratio)], ln_I_ratio, 'x')###############################3
-    plt.xlabel('Air Mass', fontsize=12)
+    plt.xlabel('Air Mass Ratio', fontsize=12)
     plt.ylabel('$ln( I / I_0 )$', fontsize=14)
 
     # Perform a linear fit to the data
@@ -108,9 +126,9 @@ def plotting(file):
 
     # Plot the linear fit line
     fit_line = np.polyval(coefficients, air_masses[:len(ln_I_ratio)]) ###############################3
-    plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: Optical Depth = {optical_depth:.2f}', color='red')###############################3
+    plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: $ \\beta $ coefficient = {optical_depth:.2f}', color='red')###############################3
     plt.legend()
-    plt.title('Optical Depth vs Air Mass')
+    # plt.title('Optical Depth vs Air Mass')
     end_points = [fit_line[0], fit_line[len(ln_I_ratio)-1]]   ###############################3
     # plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
     plt.savefig('data\\optical_depth_direct.png', dpi=300)

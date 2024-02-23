@@ -1,8 +1,11 @@
+# Xun Yu
+# Description: the main program where other modules are imported and used
+
 import functions as f
 import matplotlib.pyplot as plt
 import optical_depth_automated as optical
 
-file = r'data\LOG240218-0921.csv'
+file = r'data\LOG240216-0934.csv'
 
 
 data = f.import_data(file)

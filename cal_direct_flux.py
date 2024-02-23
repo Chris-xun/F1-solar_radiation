@@ -1,3 +1,6 @@
+# Xun Yu
+# Description: This file holds functions used to calculate the direct flux from the total flux from the data taken by lightmeter
+
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
@@ -65,7 +68,7 @@ def cal_direct_from_data(hour, actual_irr_data, file):
     direct_flux_ratio = []
     if file == 'data\LOG240216-0934.csv':
         i = 0
-    elif file == 'data\LOG240217-0814.csv':
+    elif file == 'data\LOG240217-0841.csv':
         i =1
     elif file == 'data\LOG240218-0921.csv':
         i = 2
@@ -81,7 +84,6 @@ def cal_direct_from_data(hour, actual_irr_data, file):
     # calculating the start and end times from the actual data
     start_hour = str(hour[0]).strip()
     end_hour = str(hour[-1]).strip()
-    print(start_hour, end_hour)
     start = time_to_seconds(start_hour)
     end = time_to_seconds(end_hour)
     # Interpolate at 5-second intervals
