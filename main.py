@@ -5,7 +5,7 @@ import functions as f
 import matplotlib.pyplot as plt
 import optical_depth_automated as optical
 
-file = r'data\LOG240216-0934.csv'
+file = r'data\LOG240217-0841.csv'
 
 
 data = f.import_data(file)
@@ -15,7 +15,14 @@ f.plot_data(time, intensity, temp)
 optical.plotting(file)
 
 
+
 f.rm()
+
+
+
+
+
+
 
 # #Calculating Trasnmittivity from SZA & Optical Depths (based on Beer-Lambert Law)
 # transmittivities = np.exp(-optical_depth/ np.cos(zenith_angles))

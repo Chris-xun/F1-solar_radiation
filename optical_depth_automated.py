@@ -43,7 +43,18 @@ def calculate_optical_depth(slope):
 #     return zenith_angles
 
 
-# hour_change is the change of zenith angle per hour
+def calculations_for_plotting():
+    # takes the data & performs the plotting by hour or can just chnage the input files
+    pass
+
+def plot_clear_sky(x):
+    m, c =  -0.17716701548618222, -3.291693589488445
+    x = np.array(x)
+    y = m * x + c
+    
+    plt.plot(x, y, label='Optical Depth for Clear Sky : 0.177' , color = 'red')
+
+
 def plotting(file):
     # Load the data, assuming the 4th column contains irradiance values and skipping the first 4 rows
     # irr_data = np.loadtxt('C:\Users\aryan\OneDrive - Imperial College London\Physics\Year 3 Lab\Solar Radiation\F1-solar_radiation\data\LOG240215-0945.csv', delimiter=',', skiprows=3, usecols=[3])
@@ -73,32 +84,47 @@ def plotting(file):
 
 
     # Assume I_0 is known or has been measured/calculated beforehand
-    I_0 = 1367 # mean extra terrestrial irradiance value
+    I_0 = 1361 # mean extra terrestrial irradiance value - acurate to 0.1% 
 
     # Calculate air mass for each zenith angle
     air_masses = calculate_air_mass(zenith_angles)
 
+
+    # errors
+    error_factor = 10
+    error_factor_2 = 1
+    # the most zenith angle can change in 5s is ~ 0.013 degrees in london => allow for 0.013/2 degrees error on zenith angles
+    angles_err_small = calculate_air_mass(zenith_angles-0.013/2)
+    angles_err_big = calculate_air_mass(zenith_angles+0.013/2)
+    air_masses_err = (np.array(angles_err_big) - np.array(angles_err_small))/2
+    
+
+
     # Calculate the natural logarithm of the ratio of I/I_0 for each data point
     ln_I_ratio = np.log(irr_data / I_0)
+    ln_I_ratio_max = np.log(irr_data+0.05 / (I_0 - 1))
+    ln_I_ratio_min = np.log(irr_data-0.05 / (I_0 + 1))
+    ln_I_ratio_err = (ln_I_ratio_max - ln_I_ratio_min)/2
+    air_masses = np.array(air_masses)
 
     # Plot the data
-    plt.plot(air_masses[:len(ln_I_ratio)], ln_I_ratio, 'x')###############################3
-    plt.xlabel('Air Mass Ratio', fontsize=12)
+    plt.errorbar(air_masses, ln_I_ratio, fmt='x', label='Intensity Data', yerr=ln_I_ratio_err*error_factor*error_factor_2, xerr=air_masses_err*error_factor, ecolor='black')
+    plt.xlabel('Air Mass Ratio = $X \\approx sec (\phi)$', fontsize=12)
     plt.ylabel('$ln( I / I_0 )$', fontsize=14)
 
     # Perform a linear fit to the data
-    coefficients = np.polyfit(air_masses[:len(ln_I_ratio)], ln_I_ratio, 1)###############################3
+    coefficients = np.polyfit(air_masses, ln_I_ratio, 1)
     slope, intercept = coefficients
 
     # Calculate the optical depth using the slope of the linear fit
     optical_depth = calculate_optical_depth(slope)
 
     # Plot the linear fit line
-    fit_line = np.polyval(coefficients, air_masses[:len(ln_I_ratio)]) ###############################3
-    plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: $ \\beta $ coefficient = {optical_depth:.2f}', color='red')###############################3
+    fit_line = np.polyval(coefficients, air_masses)
+    plt.errorbar(air_masses, fit_line, label=f'Linear Fit: Optical Depth = {optical_depth:.2f}', color='red')
     plt.legend()
     # plt.title('Optical Depth vs Air Mass')
-    end_points = [fit_line[0], fit_line[len(ln_I_ratio)-1]]   ###############################3
+    end_points = [fit_line[0], fit_line[-1]]
     # plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
     plt.savefig('data\\optical_depth.png', dpi=300)
     plt.close()
@@ -110,26 +136,31 @@ def plotting(file):
     # for direct irr only
     if 0.0 in irr_data_direct:
         print('0.0 in irr_data_direct')
-        [0.001 for i in irr_data_direct if i == 0.0]
+
     ln_I_ratio = np.log(irr_data_direct / I_0)
+    ln_I_ratio_max = np.log(irr_data_direct+0.05 / (I_0 - 1))
+    ln_I_ratio_min = np.log(irr_data_direct-0.05 / (I_0 + 1))
+    ln_I_ratio_err = (ln_I_ratio_max - ln_I_ratio_min)/2
     # Plot the data
-    plt.plot(air_masses[:len(ln_I_ratio)], ln_I_ratio, 'x')###############################3
-    plt.xlabel('Air Mass Ratio', fontsize=12)
+    plt.errorbar(air_masses, ln_I_ratio, fmt='x', label='Intensity Data', yerr=ln_I_ratio_err*error_factor*error_factor_2, xerr=air_masses_err*error_factor, ecolor='black')
+    plt.xlabel('Air Mass Ratio = $X \\approx sec (\phi)$', fontsize=12)
     plt.ylabel('$ln( I / I_0 )$', fontsize=14)
 
     # Perform a linear fit to the data
-    coefficients = np.polyfit(air_masses[:len(ln_I_ratio)], ln_I_ratio, 1)###############################3
+    coefficients = np.polyfit(air_masses, ln_I_ratio, 1)
     slope, intercept = coefficients
+    print('slope', slope, 'intercept', intercept)
 
     # Calculate the optical depth using the slope of the linear fit
     optical_depth = calculate_optical_depth(slope)
 
     # Plot the linear fit line
-    fit_line = np.polyval(coefficients, air_masses[:len(ln_I_ratio)]) ###############################3
-    plt.plot(air_masses[:len(ln_I_ratio)], fit_line, label=f'Linear Fit: $ \\beta $ coefficient = {optical_depth:.2f}', color='red')###############################3
+    fit_line = np.polyval(coefficients, air_masses)
+    # plt.errorbar(air_masses, fit_line, label=f'Linear Fit: Optical Depth = {optical_depth:.2f}', color='red')
+    plot_clear_sky(air_masses)  
     plt.legend()
     # plt.title('Optical Depth vs Air Mass')
-    end_points = [fit_line[0], fit_line[len(ln_I_ratio)-1]]   ###############################3
+    end_points = [fit_line[0], fit_line[-1]] 
     # plt.ylim(min(end_points)-0.05, max(end_points)+0.05)
     plt.savefig('data\\optical_depth_direct.png', dpi=300)
     plt.close()
