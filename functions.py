@@ -116,3 +116,29 @@ def calculate_solar_zenith_angle(initial_time, final_time):
     sza = solpos['apparent_zenith']
     
     return sza
+
+
+def cal_A_and_C(U, U_uncert):
+    """
+    This function calculates the A and C
+    """
+    A = []
+    A_uncert = []
+    C = []
+    C_uncert = []
+    
+    for u, uncert in zip(U, U_uncert):
+        A_upper  = 1 - np.exp(- (u - uncert))
+        A_lower = 1 - np.exp(- (u + uncert))
+        A.append((A_upper + A_lower)/2)
+        A_uncert.append((A_upper - A_lower)/2)
+        
+        C_upper = (0.177 - A_lower ) * 1362
+        C_lower = (0.177 - A_upper ) * 1360
+        C.append((C_upper + C_lower)/2)
+        C_uncert.append((C_upper - C_lower)/2)
+        
+    
+    print('A:', A, 'A_uncert:', A_uncert, 'C:', C, 'C_uncert:', C_uncert)
+
+    return A, A_uncert, C, C_uncert

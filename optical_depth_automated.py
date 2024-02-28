@@ -113,8 +113,9 @@ def plotting(file):
     plt.ylabel('$ln( I / I_0 )$', fontsize=14)
 
     # Perform a linear fit to the data
-    coefficients = np.polyfit(air_masses, ln_I_ratio, 1)
+    coefficients, cov = np.polyfit(air_masses, ln_I_ratio, 1, cov=True)
     slope, intercept = coefficients
+    print('cov', cov, 'error on slope', np.sqrt(cov[0,0])  , 'proportional error ', np.sqrt(cov[0,0])/slope)
 
     # Calculate the optical depth using the slope of the linear fit
     optical_depth = calculate_optical_depth(slope)
