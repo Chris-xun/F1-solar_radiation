@@ -133,8 +133,8 @@ def cal_A_and_C(U, U_uncert):
         A.append((A_upper + A_lower)/2)
         A_uncert.append((A_upper - A_lower)/2)
         
-        C_upper = (0.177 - A_lower ) * 1362
-        C_lower = (0.177 - A_upper ) * 1360
+        C_upper = (0.177+0.004 - A_lower ) * 1362 + 5.67*10**-8 * 273**4 * (A_upper - (0.177-0.004))
+        C_lower = (0.177-0.004 - A_upper ) * 1360 + 5.67*10**-8 * 273**4 * (A_lower - (0.177+0.004))
         C.append((C_upper + C_lower)/2)
         C_uncert.append((C_upper - C_lower)/2)
         

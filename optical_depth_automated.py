@@ -52,7 +52,7 @@ def plot_clear_sky(x):
     x = np.array(x)
     y = m * x + c
     
-    plt.plot(x, y, label='Optical Depth for Clear Sky : 0.177' , color = 'red')
+    plt.plot(x, y, label='Optical Depth for Clear Sky : $0.177 \pm 0.004$ ' , color = 'red')
 
 
 def plotting(file):
@@ -144,8 +144,8 @@ def plotting(file):
     ln_I_ratio_err = (ln_I_ratio_max - ln_I_ratio_min)/2
     # Plot the data
     plt.errorbar(air_masses, ln_I_ratio, fmt='x', label='Intensity Data', yerr=ln_I_ratio_err*error_factor*error_factor_2, xerr=air_masses_err*error_factor, ecolor='black')
-    plt.xlabel('Air Mass Ratio = $X \\approx sec (\phi)$', fontsize=12)
-    plt.ylabel('$ln( I / I_0 )$', fontsize=14)
+    plt.xlabel('Air Mass Ratio $= X $', fontsize=12)
+    plt.ylabel('ln $( I \hspace{0.2} / \hspace{0.2} I_0 )$', fontsize=14)
 
     # Perform a linear fit to the data
     coefficients = np.polyfit(air_masses, ln_I_ratio, 1)
